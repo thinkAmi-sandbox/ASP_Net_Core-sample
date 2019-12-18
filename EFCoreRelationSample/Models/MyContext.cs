@@ -12,6 +12,44 @@ namespace EFCoreRelationSample.Models
         public DbSet<BlogOfFk> BlogOfFks { get; set; }
         public DbSet<PostOfFk> PostOfFks { get; set; }
         
+        // サロゲートキー
+        // // 単一ナビゲーションプロパティによる外部キー制約を確認するための設定
+        public DbSet<BlogOfSingleNavProp> BlogOfSingleNavProps { get; set; }
+        public DbSet<PostOfSingleNavProp> PostOfSingleNavProps { get; set; }
+        
+        // [ForeignKey] Data annotationによる外部キー制約を確認するための設定
+        // 依存エンティティ(子クラス)の外部キーに設定
+        public DbSet<Blog1> Blog1List { get; set; }
+        public DbSet<Post1> Post1List { get; set; }
+        // 依存エンティティの参照ナビゲーションプロパティに設定
+        public DbSet<Blog2> Blog2List { get; set; }
+        public DbSet<Post2> Post2List { get; set; }
+        // プリンシパルエンティティのコレクションナビゲーションプロパティに設定
+        public DbSet<Blog3> Blog3List { get; set; }
+        public DbSet<Post3> Post3List { get; set; }
+        
+        // [InverseProperty] Data annotationによる外部キー制約を確認するための設定
+        public DbSet<Post4> Post4List { get; set; }
+        public DbSet<User4> User4List { get; set; }
+
+        // 単一プリンシパルキーを設定
+        public DbSet<Blog5> Blog5List { get; set; }
+        public DbSet<Post5> Post5List { get; set; }
+
+        // 複合プリンシパルキーを設定
+        public DbSet<Blog6> Blog6List { get; set; }
+        public DbSet<Post6> Post6List { get; set; }
+
+        // ナチュラルキー
+        
+        // [ForeignKey] Data annotation & PKがナチュラルキーの時の、外部キー制約を確認するための設定
+        public DbSet<NkBlog1> NkBlog1List { get; set; }
+        public DbSet<NkPost1> NkPost1List { get; set; }
+        
+        // 複合主キー・複合外部キーを持つモデル
+        public DbSet<NkBlog2> NkBlog2List { get; set; }
+        public DbSet<NkPost2> NkPost2List { get; set; }
+        
         
         // SQLをログ出力するためのLoggerFactoryを用意
         static readonly ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
@@ -42,6 +80,38 @@ namespace EFCoreRelationSample.Models
                 new {Id = 1, Content = "ふー", BlogOfFkId = 1},
                 new {Id = 2, Content = "ばー", BlogOfFkId = 1}
             );
+            
+            
+            // Data Annotationでは定義できない制約
+            // 単一プリンシパルキーを定義
+            modelBuilder.Entity<Post5>()
+                .HasOne(m => m.Blog)
+                .WithMany(m => m.Posts)
+                .HasForeignKey(m => m.BlogUrl)
+                .HasPrincipalKey(m => m.Url);
+            
+            // 複合プリンシパルキーを定義
+            modelBuilder.Entity<Post6>()
+                .HasOne(m => m.Blog)
+                .WithMany(m => m.Posts)
+                .HasForeignKey(m => new {m.BlogUrl, m.BlogAuthor})
+                .HasPrincipalKey(m => new {m.Url, m.Author});
+            
+            
+            // PKやFKがナチュラルキーの場合の定義
+            // Blogの複合主キー
+            modelBuilder.Entity<NkBlog2>()
+                .HasKey(m => new {m.Url, m.Author});
+            
+            // Postの複合外部キー
+            modelBuilder.Entity<NkPost2>()
+                .HasOne(p => p.Blog)
+                .WithMany(m => m.Posts)
+                .HasForeignKey(m => new {m.Url, m.Author});
+
+            // Postの複合主キー
+            modelBuilder.Entity<NkPost2>()
+                .HasKey(m => new {m.Url, m.Author, m.Title});
         }
     }
 }
