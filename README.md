@@ -18,3 +18,4 @@ ASP_Net_Core-sample
 ## Related Blog (Written in Japanese)
 
 - [ASP .NET Core 3.1 + EntityFramework Core を使って、一対多のリレーションがあるデータをレスポンスしてみた - メモ的な思考的な](https://thinkami.hatenablog.com/entry/2019/12/17/224720)
+- [EntityFramework Core を使って、色々な一対多のリレーションを試してみた - メモ的な思考的な](https://thinkami.hatenablog.com/entry/2019/12/18/230557)
