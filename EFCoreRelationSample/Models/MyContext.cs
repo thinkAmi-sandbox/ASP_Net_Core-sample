@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -6,7 +7,18 @@ namespace EFCoreRelationSample.Models
     public class MyContext : DbContext
     {
         // コンストラクタの型もこれでないとContextにならない
-        public MyContext(DbContextOptions<MyContext> options) : base(options) {}
+        public MyContext(DbContextOptions<MyContext> options) : base(options)
+        {
+            this.MyDeleteBehavior = DeleteBehavior.NoAction;
+        }
+
+        public DeleteBehavior MyDeleteBehavior { get; }
+        public bool IsRequired { get; }
+        public MyContext(DbContextOptions<MyContext> options, DeleteBehavior myDeleteBehavior, bool isRequired) : base(options)
+        {
+            this.MyDeleteBehavior = myDeleteBehavior;
+            this.IsRequired = isRequired;
+        }
         
         // モデルクラスへのアクセス (DbSet<TModel>) 型のpublicプロパティ
         public DbSet<BlogOfFk> BlogOfFks { get; set; }
@@ -39,6 +51,14 @@ namespace EFCoreRelationSample.Models
         // 複合プリンシパルキーを設定
         public DbSet<Blog6> Blog6List { get; set; }
         public DbSet<Post6> Post6List { get; set; }
+        
+        // null許容参照型機能の確認(NOT NULL制約に影響)
+        public DbSet<RqBlog1> RqBlog1List { get; set; }
+        public DbSet<RqBlog2> RqBlog2List { get; set; }
+        public DbSet<RqBlog3> RqBlog3List { get; set; }
+        public DbSet<RqPost3> RqPost3List { get; set; }
+        public DbSet<RqBlog4> RqBlog4List { get; set; }
+        public DbSet<RqBlog5> RqBlog5List { get; set; }
 
         // ナチュラルキー
         
@@ -49,7 +69,6 @@ namespace EFCoreRelationSample.Models
         // 複合主キー・複合外部キーを持つモデル
         public DbSet<NkBlog2> NkBlog2List { get; set; }
         public DbSet<NkPost2> NkPost2List { get; set; }
-        
         
         // SQLをログ出力するためのLoggerFactoryを用意
         static readonly ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
